@@ -19,6 +19,8 @@
 		"@sveltejs/adapter-auto": "^4.0.0",
 		"@sveltejs/kit": "^2.16.0",
 		"@sveltejs/vite-plugin-svelte": "^5.0.0",
+		"@types/luxon": "^3.4.2",
+		"@types/suncalc": "^1.9.2",
 		"eslint": "^9.18.0",
 		"eslint-config-prettier": "^10.0.1",
 		"eslint-plugin-svelte": "^3.0.0",
@@ -35,5 +37,14 @@
 		"onlyBuiltDependencies": [
 			"esbuild"
 		]
+	},
+	"dependencies": {
+		"@capacitor/android": "^7.1.0",
+		"@capacitor/cli": "^7.1.0",
+		"@capacitor/core": "^7.1.0",
+		"@capacitor/geolocation": "^7.1.1",
+		"@sveltejs/adapter-static": "^3.0.8",
+		"luxon": "^3.6.0",
+		"suncalc": "^1.9.0"
 	}
 }
