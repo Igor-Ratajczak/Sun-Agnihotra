@@ -11,21 +11,30 @@ importers:
       '@capacitor/android':
         specifier: ^7.1.0
         version: 7.1.0(@capacitor/core@7.1.0)
+      '@capacitor/background-runner':
+        specifier: ^2.1.0
+        version: 2.1.0(@capacitor/core@7.1.0)
       '@capacitor/cli':
         specifier: ^7.1.0
         version: 7.1.0
       '@capacitor/core':
         specifier: ^7.1.0
         version: 7.1.0
+      '@capacitor/filesystem':
+        specifier: ^7.0.0
+        version: 7.0.0(@capacitor/core@7.1.0)
       '@capacitor/geolocation':
         specifier: ^7.1.1
         version: 7.1.1(@capacitor/core@7.1.0)
+      '@capacitor/local-notifications':
+        specifier: ^7.0.0
+        version: 7.0.0(@capacitor/core@7.1.0)
+      '@capacitor/preferences':
+        specifier: ^7.0.0
+        version: 7.0.0(@capacitor/core@7.1.0)
       '@sveltejs/adapter-static':
         specifier: ^3.0.8
         version: 3.0.8(@sveltejs/kit@2.20.2(@sveltejs/vite-plugin-svelte@5.0.3(svelte@5.25.3)(vite@6.2.3(@types/node@22.13.13)))(svelte@5.25.3)(vite@6.2.3(@types/node@22.13.13)))
-      luxon:
-        specifier: ^3.6.0
-        version: 3.6.0
       suncalc:
         specifier: ^1.9.0
         version: 1.9.0
@@ -96,6 +105,11 @@ packages:
     peerDependencies:
       '@capacitor/core': ^7.1.0
 
+  '@capacitor/background-runner@2.1.0':
+    resolution: {integrity: sha512-5ezvBeZVOaMC1sqDgD5gvCC4RYarEA47k29fAKti+mr2B9VvTp9yjeirMxjPJHvM247z1QNDTgAvEk4KmClE4Q==}
+    peerDependencies:
+      '@capacitor/core': ^6.0.0 || ^7.0.0
+
   '@capacitor/cli@7.1.0':
     resolution: {integrity: sha512-oCjB9VB6KNTnBAlzt8tVIuBW+ZniIOCbrsp+nLoa2EfUIgoOGfMHldS4tG9KlTG3pTi5AzeHjSHJIMZwfiz6gg==}
     engines: {node: '>=20.0.0'}
@@ -104,8 +118,23 @@ packages:
   '@capacitor/core@7.1.0':
     resolution: {integrity: sha512-I0a4C8gux5sx+HDamJjCiWHEWRdJU3hejwURFOSwJjUmAMkfkrm4hOsI0dgd+S0eCkKKKYKz9WNm7DAIvhm2zw==}
 
+  '@capacitor/filesystem@7.0.0':
+    resolution: {integrity: sha512-xMzLq+ZaqYBAincYOKF1eNy/3UWwx1XM6TuvWBTVQTHeRsURzqwwbqBKtfkhbRzk5wnXEprWZz5k5iFo2s2BXw==}
+    peerDependencies:
+      '@capacitor/core': '>=7.0.0'
+
   '@capacitor/geolocation@7.1.1':
     resolution: {integrity: sha512-DXqZBQZSAYXMVXw4YhL87tPDBf4DD3VEjSDWlaALakU29rhAsMloJdqLvxXLarm16dCEBeMKMkBdCgKKHWgkZQ==}
+    peerDependencies:
+      '@capacitor/core': '>=7.0.0'
+
+  '@capacitor/local-notifications@7.0.0':
+    resolution: {integrity: sha512-+k93w1W0hZTVxM8rjttEyUKkkHxOW776POFM4snDcwv+sAxWX+YK+oqIwNtln6N5Plp3Z9TkQS0RufwZbl7GUw==}
+    peerDependencies:
+      '@capacitor/core': '>=7.0.0'
+
+  '@capacitor/preferences@7.0.0':
+    resolution: {integrity: sha512-crlTtTIWcdlLfQULJ9ZiCPpvpm51WoZ8CIVG3+XSJGyavjD4bscHP15U24ya5SjpYmI44bGY9lvhvcSCfB5+AA==}
     peerDependencies:
       '@capacitor/core': '>=7.0.0'
 
@@ -1063,10 +1092,6 @@ packages:
     resolution: {integrity: sha512-QIXZUBJUx+2zHUdQujWejBkcD9+cs94tLn0+YL8UrCh+D5sCXZ4c7LaEH48pNwRY3MLDgqUFyhlCyjJPf1WP0A==}
     engines: {node: 20 || >=22}
 
-  luxon@3.6.0:
-    resolution: {integrity: sha512-WE7p0p7W1xji9qxkLYsvcIxZyfP48GuFrWIBQZIsbjCyf65dG1rv4n83HcOyEyhvzxJCrUoObCRNFgRNIQ5KNA==}
-    engines: {node: '>=12'}
-
   magic-string@0.30.17:
     resolution: {integrity: sha512-sNPKHvyjVf7gyjwS4xGTaW/mCnF8wnjtifKBEhxfZ7E/S8tQ0rssrwGNn6q8JH/ohItJfSQp9mBtQYuTlH5QnA==}
 
@@ -1542,6 +1567,10 @@ snapshots:
     dependencies:
       '@capacitor/core': 7.1.0
 
+  '@capacitor/background-runner@2.1.0(@capacitor/core@7.1.0)':
+    dependencies:
+      '@capacitor/core': 7.1.0
+
   '@capacitor/cli@7.1.0':
     dependencies:
       '@ionic/cli-framework-output': 2.2.8
@@ -1568,10 +1597,22 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
+  '@capacitor/filesystem@7.0.0(@capacitor/core@7.1.0)':
+    dependencies:
+      '@capacitor/core': 7.1.0
+
   '@capacitor/geolocation@7.1.1(@capacitor/core@7.1.0)':
     dependencies:
       '@capacitor/core': 7.1.0
       '@capacitor/synapse': 1.0.2
+
+  '@capacitor/local-notifications@7.0.0(@capacitor/core@7.1.0)':
+    dependencies:
+      '@capacitor/core': 7.1.0
+
+  '@capacitor/preferences@7.0.0(@capacitor/core@7.1.0)':
+    dependencies:
+      '@capacitor/core': 7.1.0
 
   '@capacitor/synapse@1.0.2': {}
 
@@ -2466,8 +2507,6 @@ snapshots:
   lodash.merge@4.6.2: {}
 
   lru-cache@11.1.0: {}
-
-  luxon@3.6.0: {}
 
   magic-string@0.30.17:
     dependencies:
