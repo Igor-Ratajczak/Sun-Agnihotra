@@ -3,60 +3,139 @@
 	import { getCurrentPosition } from '$lib/composables/getLocation';
 	import sun from '$lib/assets/sun.png';
 	import { Preferences } from '@capacitor/preferences';
-	import { setLocation } from '$lib/composables/getLocation';
 	import { onMount } from 'svelte';
-	import { getSunTimes } from '$lib/composables/getSun';
+	import { updateNotifications } from '$lib/composables/getSun';
+	import { store } from '$lib/composables/store.svelte';
 
-	let latitude: null | number = $state(null);
-	let longitude: null | number = $state(null);
-	let sunSunrise: string = $state('');
-	let sunSunset: string = $state('');
-	let locationIsChanged: boolean = $state(false);
-	let notificationOffset: number = $state(5);
+	let locationIsChanged: boolean = $state(true);
+	let positions = $state({
+		location: { x: 100, y: 250 },
+		sun: { x: 100, y: 450 },
+		notify: { x: 100, y: 600 }
+	});
 
 	async function setPreferences() {
-		latitude = Number((await Preferences.get({ key: 'latitude' })).value) || null;
-		longitude = Number((await Preferences.get({ key: 'longitude' })).value) || null;
-		sunSunrise = (await Preferences.get({ key: 'sunSunrise' })).value || '';
-		sunSunset = (await Preferences.get({ key: 'sunSunset' })).value || '';
-		notificationOffset = Number((await Preferences.get({ key: 'notificationOffset' })).value) || 5;
+		await Preferences.set({ key: 'latitude', value: String(store.latitude) });
+		await Preferences.set({ key: 'longitude', value: String(store.longitude) });
+		await Preferences.set({ key: 'sunRise', value: store.sunRise });
+		await Preferences.set({ key: 'sunSet', value: store.sunSet });
+		await Preferences.set({ key: 'notificationOffset', value: String(store.notificationOffset) });
 	}
 
-	function GPS() {
-		checkPermissions();
-		getCurrentPosition();
-		setPreferences();
+	$effect(() => {
+		if (store && store.latitude !== null && store.longitude !== null) {
+			setPreferences();
+		}
+	});
+
+	async function GPS() {
+		await checkPermissions();
+		await getCurrentPosition();
 	}
 
 	onMount(async () => {
-		GPS();
-	});
+		const keys = ['latitude', 'longitude', 'sunRise', 'sunSet', 'notificationOffset', 'position'];
+		const results = await Promise.all(keys.map((key) => Preferences.get({ key })));
+		const [lat, lng, rise, set, offset, position] = results;
+		store.latitude = Number(lat.value);
+		store.longitude = Number(lng.value);
+		store.sunRise = rise.value || '';
+		store.sunSet = set.value || '';
+		store.notificationOffset = Number(offset.value) || 5;
+		positions = JSON.parse(position.value || JSON.stringify(positions));
 
-	$effect(() => {
-		if (latitude && longitude && !locationIsChanged) {
-			// if gps is disabled show manual location inputs
-			locationIsChanged = latitude === null && longitude === null ? true : false;
-		}
+		locationIsChanged = !store.latitude && !store.longitude;
+		checkPermissions();
+
+		updateNotifications(store.latitude, store.longitude);
 	});
 
 	function setNewLocation() {
-		if (latitude && longitude) {
-			setLocation(latitude, longitude);
-			setPreferences();
+		if (store.latitude && store.longitude) {
 			locationIsChanged = false;
+			updateNotifications(store.latitude, store.longitude);
 		}
 	}
 	function updateNotificationOffset() {
-		if (notificationOffset >= 0 && notificationOffset <= 60) {
-			notificationOffset = Number(notificationOffset.toFixed(0));
-			Preferences.set({ key: 'notificationOffset', value: String(notificationOffset) });
-			getSunTimes(latitude, longitude);
+		if (store.notificationOffset >= 0 && store.notificationOffset <= 60) {
+			store.notificationOffset = Number(store.notificationOffset.toFixed(0));
+			Preferences.set({ key: 'notificationOffset', value: String(store.notificationOffset) });
+			updateNotifications(store.latitude, store.longitude);
 		}
+	}
+
+	function onDragStart(event: DragEvent, key: 'location' | 'sun' | 'notify') {
+		event.dataTransfer?.setData('text/plain', key);
+	}
+
+	async function onDrop(event: DragEvent) {
+		event.preventDefault();
+		const key = event.dataTransfer?.getData('text/plain') as 'location' | 'sun' | 'notify';
+		const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+		const draggedEl = document.querySelector(`.${key}`) as HTMLElement;
+		const offsetX = draggedEl.offsetWidth / 2;
+		const offsetY = draggedEl.offsetHeight / 2;
+
+		const x = Math.round((event.clientX - rect.left - offsetX) / 50) * 50;
+		const y = Math.round((event.clientY - rect.top - offsetY) / 50) * 50;
+
+		positions[key] = { x, y };
+		await Preferences.set({ key: 'position', value: JSON.stringify(positions) });
+	}
+
+	function allowDrop(event: DragEvent) {
+		event.preventDefault();
 	}
 </script>
 
-<main class="container">
-	{#if latitude === null || longitude === null || locationIsChanged === true}
+<main class="container dropzone" ondragover={allowDrop} ondrop={onDrop}>
+	{#if store.latitude && store.longitude && !locationIsChanged}
+		<div
+			class="location draggable"
+			role="button"
+			tabindex="0"
+			draggable="true"
+			ondragstart={(e) => onDragStart(e, 'location')}
+			style="left: {positions.location.x}px; top: {positions.location.y}px;"
+		>
+			<b>Lokalizacja:</b>
+			<div class="latitude">{store.latitude.toFixed(2)}</div>
+			<div class="longitude">{store.longitude.toFixed(2)}</div>
+			<button class="change_location" onclick={() => (locationIsChanged = true)}>Zmień</button>
+		</div>
+
+		<div
+			class="sun draggable"
+			role="button"
+			tabindex="0"
+			draggable="true"
+			ondragstart={(e) => onDragStart(e, 'sun')}
+			style="left: {positions.sun.x}px; top: {positions.sun.y}px;"
+		>
+			<img src={sun} alt="sun" />
+			<div class="sunrise">{store.sunRise || '12:23'}</div>
+			<div class="sunset">{store.sunSet || '12:23'}</div>
+		</div>
+		<div
+			class="notify draggable"
+			role="button"
+			tabindex="0"
+			draggable="true"
+			ondragstart={(e) => onDragStart(e, 'notify')}
+			style="left: {positions.notify.x}px; top: {positions.notify.y}px;"
+		>
+			<b>Powiadomienia</b>
+			<input
+				class="notificationOffset"
+				type="number"
+				max="60"
+				min="0"
+				placeholder="Ile minut przed wydarzeniem?"
+				onchange={() => updateNotificationOffset()}
+				bind:value={store.notificationOffset}
+			/>
+		</div>
+	{:else if locationIsChanged}
 		<div class="set_location">
 			<b>Ustaw lokalizację:</b>
 			<button class="gps" onclick={() => GPS()}>Ustaw lokalizację GPS</button>
@@ -65,42 +144,32 @@
 				type="number"
 				class="latitude"
 				placeholder="Wpisz szerokość geograficzną"
-				bind:value={latitude}
+				bind:value={store.latitude}
 			/>
 			<input
 				type="number"
 				class="longitude"
 				placeholder="Wpisz długość geograficzną"
-				bind:value={longitude}
+				bind:value={store.longitude}
 			/>
-			<button class="set_manual" onclick={() => setNewLocation()}>Zatwierdź</button>
+			<button class="set_manually" onclick={() => setNewLocation()}>Zatwierdź</button>
 		</div>
-	{:else}
-		<div class="location">
-			<b>Lokalizacja:</b>
-			<div class="latitude">{latitude.toFixed(2)}</div>
-			<div class="longitude">{longitude.toFixed(2)}</div>
-			<button class="change_location" onclick={() => (locationIsChanged = true)}>Zmień</button>
-		</div>
-		<div class="sun">
-			<img src={sun} alt="sun" />
-			<div class="sunrise">{sunSunrise}</div>
-			<div class="sunset">{sunSunset}</div>
-		</div>
-		<b>Powiadomienia</b>
-		<input
-			class="notificationOffset"
-			type="number"
-			max="60"
-			min="0"
-			placeholder="Ile minut przed wydarzeniem?"
-			onchange={() => updateNotificationOffset()}
-			bind:value={notificationOffset}
-		/>
 	{/if}
 </main>
 
 <style>
+	.dropzone {
+		position: relative;
+		width: 100%;
+		height: 100vh;
+	}
+	.draggable {
+		position: absolute;
+		cursor: grab;
+		background-color: rgba(0, 0, 0, 0.5);
+		padding: 10px;
+		border-radius: 10px;
+	}
 	button,
 	input {
 		margin: 10px;
@@ -114,6 +183,7 @@
 		gap: 1em 0;
 		color: white;
 	}
+
 	main {
 		font-family: 'Roboto', sans-serif;
 		font-size: 25px;
@@ -129,6 +199,15 @@
 			gap: 1em 0;
 		}
 
+		.notify {
+			grid-template-columns: 100%;
+
+			input {
+				width: 90%;
+				text-align: center;
+			}
+		}
+
 		> div {
 			margin: 10px;
 			padding: 10px;
@@ -138,6 +217,8 @@
 			grid-template-columns: 1fr 1fr;
 			gap: 0 10px;
 			grid-template-rows: 1fr 1fr;
+			width: 8em;
+			justify-items: center;
 
 			> div {
 				grid-row: 2;

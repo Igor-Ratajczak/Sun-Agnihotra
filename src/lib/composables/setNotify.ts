@@ -1,5 +1,6 @@
 import { LocalNotifications } from '@capacitor/local-notifications';
-import { Preferences } from '@capacitor/preferences';
+import { Temporal } from '@js-temporal/polyfill';
+import { store } from './store.svelte';
 
 function createChannel(id: string) {
 	if (id === 'SunRise') {
@@ -8,7 +9,7 @@ function createChannel(id: string) {
 			name: 'Wschód',
 			description: 'Zaraz będzie wschód słońca',
 			sound: 'gong',
-			importance: 5,
+			importance: 1,
 			visibility: 1
 		});
 	} else if (id === 'SunSet') {
@@ -17,31 +18,36 @@ function createChannel(id: string) {
 			name: 'Zachód',
 			description: 'Zaraz będzie zachód słońca',
 			sound: 'gong',
-			importance: 5,
+			importance: 1,
 			visibility: 1
 		});
 	}
 }
 
-export async function createNotification(id: string, name: string, time: Date) {
+export async function createNotification(id: string, name: string, time: string) {
 	const channels = await LocalNotifications.listChannels();
 	if (!channels.channels.find((channel) => channel.id === id)) {
 		createChannel(id);
 	}
+	const notificationOffset = store.notificationOffset;
 
-	const notificationOffset =
-		Number((await Preferences.get({ key: 'notificationOffset' })).value) || 5;
+	const new_time = Temporal.PlainDateTime.from(time).add({
+		minutes: -notificationOffset - 1
+	});
 
-	const new_time = time.setMinutes(time.getMinutes() - notificationOffset - 0.5);
-	time = new Date(new_time);
+	const notificationId = Number(
+		`${new_time.toPlainDate().toString().replaceAll('-', '')}${id === 'SunRise' ? '0' : '1'}`
+	);
 
-	LocalNotifications.schedule({
+	await LocalNotifications.cancel({ notifications: [{ id: notificationId }] });
+
+	await LocalNotifications.schedule({
 		notifications: [
 			{
 				title: name,
 				body: name,
-				id: 1,
-				schedule: { at: time },
+				id: notificationId,
+				schedule: { at: new Date(new_time.toString()) },
 				sound: 'gong',
 				attachments: [],
 				actionTypeId: '',
@@ -50,7 +56,19 @@ export async function createNotification(id: string, name: string, time: Date) {
 			}
 		]
 	});
-	LocalNotifications.getPending().then((result) => {
-		console.log(result.notifications); // List of scheduled notifications
+	const now = Temporal.Now.plainDateTimeISO();
+
+	const result = await LocalNotifications.getPending();
+
+	const toCancel = result.notifications.filter((notif) => {
+		if (!notif.schedule?.at) return false;
+		const scheduled = Temporal.PlainDateTime.from(
+			new Date(notif.schedule.at).toISOString().replace('Z', '')
+		);
+		return Temporal.PlainDateTime.compare(scheduled, now) < 0;
 	});
+
+	if (toCancel.length) {
+		await LocalNotifications.cancel({ notifications: toCancel });
+	}
 }
