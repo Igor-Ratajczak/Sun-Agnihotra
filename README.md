@@ -1,38 +1,79 @@
-# sv
+# Sun-set-rise
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+A modern application that tracks sunrise and sunset times for your location, built with Svelte and Capacitor.
 
-## Creating a project
+## Features
 
-If you're seeing this, you've probably already done this step. Congrats!
+- Real-time sunrise and sunset time calculations based on your location
+- GPS location support
+- Manual location input (latitude/longitude)
+- Customizable notifications before sunrise and sunset
+- Draggable UI elements for personalized layout
+- Local data persistence
+- Background notifications with sound alerts
 
-```bash
-# create a new project in the current directory
-npx sv create
+## Permissions
 
-# create a new project in my-app
-npx sv create my-app
-```
+The app requires the following permissions:
 
-## Developing
+- Location access # Sun-set-rise
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+A modern application that tracks sunrise and sunset times for your location, built with Svelte and Capacitor.
 
-```bash
-npm run dev
+## Features
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
+- Real-time sunrise and sunset time calculations based on your location
+- GPS location support
+- Manual location input (latitude/longitude)
+- Customizable notifications before sunrise and sunset
+- Draggable UI elements for personalized layout
+- Local data persistence
+- Background notifications with sound alerts
 
-## Building
+## Permissions
 
-To create a production version of your app:
+The app requires the following permissions:
 
-```bash
-npm run build
-```
+- Location access (for GPS coordinates) (optional)
+- Notification permissions (for sunrise/sunset alerts)
 
-You can preview the production build with `npm run preview`.
+## How It Works
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+1. The app gets your location (via GPS or manual input)
+2. Calculates precise sunrise and sunset times for your coordinates using SunCalc Library
+3. Allows you to set notification preferences (0-60 minutes before events)
+4. Sends local notifications before each sunrise and sunset
+5. Stores your preferences locally for future use
+
+## Technologies
+
+- SvelteKit - Frontend framework
+- Capacitor - Native runtime
+- SunCalc - Sun position calculations
+- Temporal API - Date/time handling
+
+## Contributing
+
+Feel free to open issues and submit pull requests to help improve the application.
+(for GPS coordinates) (optional)
+
+- Notification permissions (for sunrise/sunset alerts)
+
+## How It Works
+
+1. The app gets your location (via GPS or manual input)
+2. Calculates precise sunrise and sunset times for your coordinates using SunCalc Library
+3. Allows you to set notification preferences (0-60 minutes before events)
+4. Sends local notifications before each sunrise and sunset
+5. Stores your preferences locally for future use
+
+## Technologies
+
+- SvelteKit - Frontend framework
+- Capacitor - Native runtime
+- SunCalc - Sun position calculations
+- Temporal API - Date/time handling
+
+## Contributing
+
+Feel free to open issues and submit pull requests to help improve the application.
