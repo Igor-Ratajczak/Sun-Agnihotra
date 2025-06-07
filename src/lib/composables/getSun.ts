@@ -24,15 +24,15 @@ export async function getSunTimes(date: string, lat: number, lng: number) {
 		store.sunSet = set.slice(0, 5);
 		return {
 			day: date.toString(),
-			rise: times.sunrise.toISOString().replace('Z', ''),
-			set: times.sunset.toISOString().replace('Z', '')
+			rise: times.sunrise.toLocaleString(),
+			set: times.sunset.toLocaleString()
 		};
 	}
 
 	return {
 		day: date.toString(),
-		rise: times.sunrise.toISOString().replace('Z', ''),
-		set: times.sunset.toISOString().replace('Z', '')
+		rise: times.sunrise.toLocaleString(),
+		set: times.sunset.toLocaleString()
 	};
 }
 

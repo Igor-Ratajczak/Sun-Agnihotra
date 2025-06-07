@@ -31,13 +31,14 @@ export async function createNotification(id: string, name: string, time: string)
 	}
 	const notificationOffset = store.notificationOffset;
 
-	const new_time = Temporal.PlainDateTime.from(time).add({
-		minutes: -notificationOffset - 1
-	});
+	const new_time = new Date(time);
+	new_time.setMinutes(new_time.getMinutes() - notificationOffset - 1);
 
-	const notificationId = Number(
-		`${new_time.toPlainDate().toString().replaceAll('-', '')}${id === 'SunRise' ? '0' : '1'}`
-	);
+	const year = new_time.getUTCFullYear();
+	const month = new_time.getUTCMonth() < 10 ? '0' + new_time.getUTCMonth() : new_time.getUTCMonth();
+	const day = new_time.getUTCDate() < 10 ? '0' + new_time.getUTCDate() : new_time.getUTCDate();
+
+	const notificationId = Number(`${year}${month}${day}${id === 'SunRise' ? '0' : '1'}`);
 
 	await LocalNotifications.cancel({ notifications: [{ id: notificationId }] });
 
@@ -47,7 +48,7 @@ export async function createNotification(id: string, name: string, time: string)
 				title: name,
 				body: name,
 				id: notificationId,
-				schedule: { at: new Date(new_time.toString()) },
+				schedule: { at: new_time },
 				sound: 'gong',
 				attachments: [],
 				actionTypeId: '',
@@ -60,10 +61,10 @@ export async function createNotification(id: string, name: string, time: string)
 
 	const result = await LocalNotifications.getPending();
 
-	const toCancel = result.notifications.filter((notif) => {
-		if (!notif.schedule?.at) return false;
+	const toCancel = result.notifications.filter((notify) => {
+		if (!notify.schedule?.at) return false;
 		const scheduled = Temporal.PlainDateTime.from(
-			new Date(notif.schedule.at).toISOString().replace('Z', '')
+			new Date(notify.schedule.at).toISOString().replace('Z', '')
 		);
 		return Temporal.PlainDateTime.compare(scheduled, now) < 0;
 	});
