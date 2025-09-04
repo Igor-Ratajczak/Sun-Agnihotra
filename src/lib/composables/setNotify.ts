@@ -34,9 +34,9 @@ export async function createNotification(id: string, name: string, time: string)
 	const new_time = new Date(time);
 	new_time.setMinutes(new_time.getMinutes() - notificationOffset - 1);
 
-	const year = new_time.getUTCFullYear();
-	const month = new_time.getUTCMonth() < 10 ? '0' + new_time.getUTCMonth() : new_time.getUTCMonth();
-	const day = new_time.getUTCDate() < 10 ? '0' + new_time.getUTCDate() : new_time.getUTCDate();
+	const year = new_time.getFullYear();
+	const month = String(new_time.getMonth() + 1).padStart(2, '0');
+	const day = String(new_time.getDate()).padStart(2, '0');
 
 	const notificationId = Number(`${year}${month}${day}${id === 'SunRise' ? '0' : '1'}`);
 
