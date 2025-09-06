@@ -9,7 +9,7 @@ function createChannel(id: string) {
 			name: 'Wschód',
 			description: 'Zaraz będzie wschód słońca',
 			sound: 'gong',
-			importance: 1,
+			importance: 3,
 			visibility: 1
 		});
 	} else if (id === 'SunSet') {
@@ -18,7 +18,7 @@ function createChannel(id: string) {
 			name: 'Zachód',
 			description: 'Zaraz będzie zachód słońca',
 			sound: 'gong',
-			importance: 1,
+			importance: 3,
 			visibility: 1
 		});
 	}
